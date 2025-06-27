@@ -1,5 +1,7 @@
 using MinimalApiBase;
 
+namespace minimal_api_base; // This will be replaced by RootNamespaceName
+
 public class GasStation : BaseEntity
 {
     public string Name { get; set; } = string.Empty;

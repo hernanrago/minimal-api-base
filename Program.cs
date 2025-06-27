@@ -1,3 +1,5 @@
+namespace minimal_api_base; // This will be replaced by RootNamespaceName
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
