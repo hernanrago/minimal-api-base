@@ -23,18 +23,55 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    // Create a method that returns a Result to demonstrate the pattern
+    var result = GetWeatherForecastResult();
+    
+    // Use Match to handle success and error cases with delegates
+    // This demonstrates pattern matching with functional-style error handling
+    return result.Match(
+        onSuccess: forecast => Results.Ok(forecast),  // Delegate for success case
+        onError: error => Results.Problem(error)      // Delegate for error case
+    );
+    
+    /* Alternative usage examples with Match:
+     * 
+     * // Using Match with void actions:
+     * result.Match(
+     *     onSuccess: forecast => Console.WriteLine($"Got {forecast.Length} forecasts"),
+     *     onError: error => Console.WriteLine($"Error: {error}")
+     * );
+     * 
+     * // Using Match to transform to different types:
+     * var message = result.Match(
+     *     onSuccess: forecast => $"Successfully generated {forecast.Length} forecasts",
+     *     onError: error => $"Failed: {error}"
+     * );
+     */
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+// Helper method to demonstrate Result pattern with error handling
+Result<WeatherForecast[], string> GetWeatherForecastResult()
+{
+    try
+    {
+        var forecast = Enumerable.Range(1, 5).Select(index =>
+            new WeatherForecast
+            (
+                DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                Random.Shared.Next(-20, 55),
+                summaries[Random.Shared.Next(summaries.Length)]
+            ))
+            .ToArray();
+        
+        return Result<WeatherForecast[], string>.Success(forecast);
+    }
+    catch (Exception ex)
+    {
+        return Result<WeatherForecast[], string>.Failure($"Failed to generate weather forecast: {ex.Message}");
+    }
+}
 
 app.Run();
 
