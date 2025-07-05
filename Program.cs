@@ -26,11 +26,27 @@ app.MapGet("/weatherforecast", () =>
     // Create a method that returns a Result to demonstrate the pattern
     var result = GetWeatherForecastResult();
     
-    // Use Match to handle success and error cases
+    // Use Match to handle success and error cases with delegates
+    // This demonstrates pattern matching with functional-style error handling
     return result.Match(
-        onSuccess: forecast => Results.Ok(forecast),
-        onError: error => Results.Problem(error)
+        onSuccess: forecast => Results.Ok(forecast),  // Delegate for success case
+        onError: error => Results.Problem(error)      // Delegate for error case
     );
+    
+    /* Alternative usage examples with Match:
+     * 
+     * // Using Match with void actions:
+     * result.Match(
+     *     onSuccess: forecast => Console.WriteLine($"Got {forecast.Length} forecasts"),
+     *     onError: error => Console.WriteLine($"Error: {error}")
+     * );
+     * 
+     * // Using Match to transform to different types:
+     * var message = result.Match(
+     *     onSuccess: forecast => $"Successfully generated {forecast.Length} forecasts",
+     *     onError: error => $"Failed: {error}"
+     * );
+     */
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
